@@ -15,11 +15,13 @@ function solution(genres, plays) {
         songsByGenre.get(genre).push({id: i, play: play,});
     }
     
+    
     const sortedGenres = [...genreTotal.entries()].sort((a, b) => b[1] - a[1]).map(([genre]) => genre);
     
     const answer = [];
     
     for (const genre of sortedGenres) {
+        console.log(songsByGenre.get(genre).entries());
         const sortedSongs = songsByGenre.get(genre).sort((a, b) => {
             if (b.play !== a.play) return b.play - a.play; 
             return a.id - b.id;});
