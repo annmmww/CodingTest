@@ -1,86 +1,34 @@
-class Node {
-    constructor(weight, input) {
-        this.weight = weight;
-        this.input = input;
-        this.next = null;
-    }
-}
+function solution(bridge_length, maxWeight, truck_weights) {
+    let time = 0;
+    let nextTruckIndex = 0;
+    let currentWeight = 0;
 
-class Queue {
-    constructor(size) {
-        this.head = null;
-        this.tail = null;
-        this.size = 0;
-        this.weight = 0;
-    }
-    
-    enqueue(weight, input) {
-        const newNode = new Node(weight, input);
-        
-        if (this.isEmpty()) {
-            this.head = newNode;
-            this.tail = newNode;
-            this.size++;
-            this.weight += weight;
-            return;
-        }
-        
-        this.tail.next = newNode;
-        this.tail = newNode;
-        this.weight += weight;
-        this.size++;
-    }
-    
-    dequeue() {
-        if (this.isEmpty()) return;
-        
-        const value = this.head.weight;
-        this.head = this.head.next;
-        this.size--;
-        
-        if (this.isEmpty()) {
-            this.tail = null;
-        }
-        this.weight -= value;
-        return value;
-    }
-    
-    peek() {
-        if (this.isEmpty()) return null;
-        
-        return this.head.input;
-    }
-    
-    isEmpty() {
-        return this.size === 0;
-    }
-    
-    getSize() {
-        return this.size;
-    }
-    
-    getWeight() {
-        return this.weight;
-    }
-}
+    const bridge = [];
+    let head = 0;
 
-function solution(bridge_length, weight, truck_weights) {
-    let truck_count = 0;
-    let out_truck_count = 0;
-    const queue = new Queue();
-    let answer = 0;
-    while (out_truck_count < truck_weights.length) {
-        answer++;
-        
-        if (answer - queue.peek() === bridge_length) {
-            const value = queue.dequeue();
-            out_truck_count++;
+    while (nextTruckIndex < truck_weights.length || head < bridge.length) {
+        time++;
+
+        // 다리에서 나가는 트럭 처리
+        while (head < bridge.length && bridge[head].exitTime === time) {
+            currentWeight -= bridge[head].weight;
+            head++;
         }
-        if (weight - queue.getWeight() >= truck_weights[truck_count] && queue.getSize() <= bridge_length) {
-            queue.enqueue(truck_weights[truck_count], answer);
-            truck_count++;
+
+        // 다음 트럭 올릴 수 있으면 올리기
+        if (nextTruckIndex < truck_weights.length) {
+            const nextWeight = truck_weights[nextTruckIndex];
+
+            if (currentWeight + nextWeight <= maxWeight) {
+                currentWeight += nextWeight;
+                bridge.push({
+                    weight: nextWeight,
+                    exitTime: time + bridge_length
+                });
+                nextTruckIndex++;
+            }
         }
     }
-    
-    return answer;
+
+    return time;
 }
